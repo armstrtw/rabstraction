@@ -1,8 +1,10 @@
 #ifndef RTYPE_HPP
 #define RTYPE_HPP
 
+#include <string>
 #include <Rinternals.h>
 
+using std::string;
 
 template<SEXPTYPE T>
 class Rtype;
@@ -37,12 +39,9 @@ public:
 template<>
 class Rtype<STRSXP> {
 public:
-  typedef std::string ValueType;
-  static std::string scalar(SEXP x) {
-    std::string ans;
-    if(x!=R_NilValue) {
-      ans(CHAR(STRING_ELT(x, 0)));
-    }
+  typedef string ValueType;
+  static string scalar(SEXP x) {
+    string ans(CHAR(STRING_ELT(x, 0)));
     return ans;
   }
 };
