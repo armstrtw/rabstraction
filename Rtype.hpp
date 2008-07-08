@@ -34,6 +34,19 @@ public:
   }
 };
 
+template<>
+class Rtype<STRSXP> {
+public:
+    typedef std::string ValueType;
+    static std::string scalar(SEXP x) {
+        std::string ans;
+        if(x!=R_NilValue) {
+            ans(CHAR(STRING_ELT(x, 0)));
+        }
+        return ans;
+    }
+};
+
 
 
 #endif // RTYPE_HPP
