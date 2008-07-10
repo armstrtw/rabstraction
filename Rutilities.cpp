@@ -1,4 +1,4 @@
-#include "R_utilities.hpp"
+#include "Rutilities.hpp"
 
 void addPOSIXattributes(SEXP x) {
   SEXP r_dates_class;
@@ -35,7 +35,7 @@ SEXP getDatesSEXP(const SEXP x) {
 }
 
 
-SEXP string2sexp(const vector<string>& x) {
+SEXP string2sexp(const std::vector<std::string>& x) {
   SEXP ans;
   PROTECT(ans = allocVector(STRSXP,x.size()));
 
@@ -46,7 +46,18 @@ SEXP string2sexp(const vector<string>& x) {
   return ans;
 }
 
-void setColnamesMatrix(const SEXP x, const vector<string>& s) {
+void sexp2string(const SEXP str_sexp, std::vector<std::string>& ans) {
+
+  if(str_sexp==R_NilValue) {
+    return;
+  }
+
+  for(int i=0; i < length(str_sexp); i++) {
+    ans.push_back(const_cast<char *>(CHAR(STRING_ELT(str_sexp,i))));
+  }
+}
+
+void setColnamesMatrix(const SEXP x, const std::vector<std::string>& s) {
 
   SEXP dimnames, cnames;
 
@@ -63,7 +74,7 @@ void setColnamesMatrix(const SEXP x, const vector<string>& s) {
   UNPROTECT(2);
 }
 
-void getColnamesMatrix(const SEXP x, vector<string>& ans) {
+void getColnamesMatrix(const SEXP x, std::vector<std::string>& ans) {
 
   SEXP dimnames, cnames;
 
