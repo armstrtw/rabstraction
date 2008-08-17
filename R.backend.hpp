@@ -50,8 +50,8 @@ namespace RAbstraction {
     void attach();
     void detach();
 
-    void Rbackend::setAttribute(const char* attrubuteName, const SEXP attributeValue);
-    const SEXP Rbackend::fetchAttribute(const char* attrubuteName);
+    void setAttribute(const char* attrubuteName, const SEXP attributeValue);
+    const SEXP fetchAttribute(const char* attrubuteName);
 
     const SEXP getRobject();
   };
