@@ -23,18 +23,18 @@
 
 namespace RAbstraction {
 
-  template<typename T>
+  template<typename RTYPE>
   class RMatrix {
   private:
-    Rbackend handle_;
+    Rbackend<RTYPE>* handle_;
   public:
     ~RMatrix();
     RMatrix();
-    RMatrix(const int rows, const int cols);
+    RMatrix(const R_len_t rows, const R_len_t cols);
     RMatrix(const SEXP x);
 
-    const int rows();
-    const int cols();
+    const R_len_t rows();
+    const R_len_t cols();
 
     template<typename T>
     void setColnames(T beg, T end);
@@ -48,12 +48,38 @@ namespace RAbstraction {
     template<typename T>
     void getRownames(T insert_iter);
 
-    T operator()(const int m, const int n);
+    T operator()(const R_len_t m, const R_len_t n);
   };
 
-  ~RMatrix<T>::RMatrix() {
+  ~RMatrix<RTYPE>::RMatrix() {
     handle_->detach();
   }
+
+  RMatrix<RTYPE>::RMatrix() {
+    handle_ = Rbackend<RTYPE>::init();
+  }
+
+  RMatrix<RTYPE>::RMatrix(R_len_t rows, R_len_t cols) {
+    SEXP dim_attribute;
+
+    // check for dimensions too big
+    if(static_cast<double>(rows) * static_cast<double>(cols) > INT_MAX) {
+      handle_ = Rbackend<RTYPE>::init();
+      Rprintf("matrix dimensions too big.\n");
+    } else {
+      handle_ = Rbackend<RTYPE>::init(rows*cols);
+    }
+
+    // add dimensions
+    PROTECT(dims = allocVector(INTSXP, 2));
+    INTEGER(dims)[0] = rows;
+    INTEGER(dims)[1] = cols;
+    setAttrib(handle_, R_DimSymbol, dims);
+    UNPROTECT(1); // dims
+  }
+
+  RMatrix<RTYPE>::RMatrix(const SEXP x) {
+    handle_ =
 
 } // namespace RAbstraction
 
