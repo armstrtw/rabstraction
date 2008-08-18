@@ -19,38 +19,96 @@
 #define RVECTOR_HPP
 
 #include <Rinternals.h>
+#include <R.backend.hpp>
+#include <Robject.hpp>
+#include <Rutilities.hpp>
 
+namespace RAbstraction {
 
-template<SEXPTYPE T>
-class RVector;
+  template<typename RTYPE>
+  class RVector : public Robject<RTYPE> {
+  public:
+    typedef typename Rtype<RTYPE>::ValueType ValueType;
+    ~RVector();
+    RVector();
+    RVector(const R_len_t length);
+    RVector(const SEXP x);
 
-template<>
-class RVector<REALSXP> {
-public:
-  typedef double ValueType;
-  static ValueType scalar(SEXP x) {
-    return REAL(x)[0];
+    const R_len_t length();
+
+    template<typename T>
+    void setNames(T beg, T end);
+
+    template<typename T>
+    void getNames(T insert_iter);
+
+    ValueType operator()(const R_len_t i);
+  };
+
+  template<typename RTYPE>
+  ~RVector<RTYPE>::RVector() {}
+  // now handled by Robject -- handle_->detach();
+
+  template<typename RTYPE>
+  RVector<RTYPE>::RVector() : Robject() {}
+
+  template<typename RTYPE>
+  RVector<RTYPE>::RVector(R_len_t length) : Robject(length) {}
+
+  template<typename RTYPE>
+  RVector<RTYPE>::RVector(const SEXP x) : Robject(x) {}
+
+  template<typename RTYPE>
+  const R_len_t length() {
+    return length(handle_->getRobject());
   }
-};
 
-template<>
-class RVector<INTSXP> {
-public:
-  typedef int ValueType;
-  static ValueType scalar(SEXP x) {
-    return INTEGER(x)[0];
+  template<typename RTYPE>
+  template<typename T>
+  void setNames(T beg, T end) {
+    SEXP r_object, r_object_names, new_names;
+    int unprotect = 0;
+
+    r_object = handle_->getRobject();
+
+    const int new_names_size = static_cast<const int>(std::distance(beg,end));
+
+    if(new_names_size!=length(r_object)) {
+      return;
+    }
+
+    PROTECT(new_names = string2sexp(beg,end));
+    ++unprotect;
+
+    setAttrib(r_object, R_NamesSymbol, new_names);
+    UNPROTECT(unprotect);
   }
-};
 
-template<>
-class RVector<LGLSXP> {
-public:
-  typedef int ValueType;
-  static ValueType scalar(SEXP x) {
-    return INTEGER(x)[0];
+
+  template<typename RTYPE>
+  template<typename T>
+  void getNames(T insert_iter) {
+    SEXP r_object, r_object_names, cnames;
+
+    r_object = handle_->getRobject();
+    r_object_names = getAttrib(x, R_NamesSymbol);
+
+    if(r_object_names==R_NilValue) {
+      return;
+    }
+    sexp2string(r_object_names,insert_iter);
   }
-};
 
 
+  template<typename RTYPE>
+  ValueType& operator()(const R_len_t i, const R_len_t j) {
+    SEXP r_object;
+    ValueType hat;
+    r_object = handle_->getRobject();
+    Rprintf("not implemented yet.\n");
+    return *hat;
+  }
 
-#endif // RVECTOR_HPP
+} // namespace RAbstraction
+
+#endif //RVECTOR_HPP
