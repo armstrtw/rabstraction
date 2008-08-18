@@ -24,9 +24,7 @@
 namespace RAbstraction {
 
   template<typename RTYPE>
-  class RMatrix {
-  private:
-    Rbackend<RTYPE>* handle_;
+  class RMatrix : public Robject<RTYPE> {
   public:
     ~RMatrix();
     RMatrix();
@@ -52,23 +50,14 @@ namespace RAbstraction {
   };
 
   ~RMatrix<RTYPE>::RMatrix() {
-    handle_->detach();
+    // now handled by Robject -- handle_->detach();
   }
 
-  RMatrix<RTYPE>::RMatrix() {
-    handle_ = Rbackend<RTYPE>::init();
+  RMatrix<RTYPE>::RMatrix() : Robject() {
   }
 
-  RMatrix<RTYPE>::RMatrix(R_len_t rows, R_len_t cols) {
+  RMatrix<RTYPE>::RMatrix(R_len_t rows, R_len_t cols) : Robject(rows*cols) {
     SEXP dim_attribute;
-
-    // check for dimensions too big
-    if(static_cast<double>(rows) * static_cast<double>(cols) > INT_MAX) {
-      handle_ = Rbackend<RTYPE>::init();
-      Rprintf("matrix dimensions too big.\n");
-    } else {
-      handle_ = Rbackend<RTYPE>::init(rows*cols);
-    }
 
     // add dimensions
     PROTECT(dims = allocVector(INTSXP, 2));
@@ -78,8 +67,8 @@ namespace RAbstraction {
     UNPROTECT(1); // dims
   }
 
-  RMatrix<RTYPE>::RMatrix(const SEXP x) {
-    handle_ =
+  RMatrix<RTYPE>::RMatrix(const SEXP x) : Robject(x) {
+  }
 
 } // namespace RAbstraction
 
