@@ -20,12 +20,15 @@
 
 #include <Rinternals.h>
 #include <R.backend.hpp>
+#include <Robject.hpp>
+#include <Rutilities.hpp>
 
 namespace RAbstraction {
 
   template<typename RTYPE>
   class RMatrix : public Robject<RTYPE> {
   public:
+    typedef typename Rtype<RTYPE>::ValueType ValueType;
     ~RMatrix();
     RMatrix();
     RMatrix(const R_len_t rows, const R_len_t cols);
@@ -46,18 +49,26 @@ namespace RAbstraction {
     template<typename T>
     void getRownames(T insert_iter);
 
-    T operator()(const R_len_t m, const R_len_t n);
+    ValueType operator()(const R_len_t m, const R_len_t n);
   };
 
-  ~RMatrix<RTYPE>::RMatrix() {
-    // now handled by Robject -- handle_->detach();
-  }
+  template<typename RTYPE>
+  ~RMatrix<RTYPE>::RMatrix() {}
+  // now handled by Robject -- handle_->detach();
 
-  RMatrix<RTYPE>::RMatrix() : Robject() {
-  }
+  template<typename RTYPE>
+  RMatrix<RTYPE>::RMatrix() : Robject() {}
 
+  template<typename RTYPE>
   RMatrix<RTYPE>::RMatrix(R_len_t rows, R_len_t cols) : Robject(rows*cols) {
     SEXP dim_attribute;
+
+    // check overflow
+    if(static_cast<double>(rows) * static_cast<double>(cols) > INT_MAX) {
+      handle_->detach();
+      handle_ = Rbackend<RTYPE>::init();
+      Rprintf("matrix dimensions too big.\n");
+  }
 
     // add dimensions
     PROTECT(dims = allocVector(INTSXP, 2));
@@ -67,7 +78,129 @@ namespace RAbstraction {
     UNPROTECT(1); // dims
   }
 
-  RMatrix<RTYPE>::RMatrix(const SEXP x) : Robject(x) {
+  template<typename RTYPE>
+  RMatrix<RTYPE>::RMatrix(const SEXP x) : Robject(x) {}
+
+  template<typename RTYPE>
+  const R_len_t rows() {
+    return nrows(handle_->getRobject());
+  }
+
+  template<typename RTYPE>
+  const R_len_t cols() {
+    return nrows(handle_->getRobject());
+  }
+
+  template<typename RTYPE>
+  template<typename T>
+  void setColnames(T beg, T end) {
+    SEXP r_object, dimnames, cnames;
+    int unprotect = 0;
+
+    r_object = handle_->getRobject();
+
+    const int cn_size = static_cast<const int>(std::distance(beg,end));
+
+    if(cn_size!=ncols(r_object)) {
+      return;
+    }
+
+    PROTECT(cnames = string2sexp(beg,end));
+    ++unprotect;
+
+    // check if we have existing dimnames
+    dimnames = getAttrib(r_object, R_DimNamesSymbol);
+    if(dimnames == R_NilValue) {
+      PROTECT(dimnames = allocVector(VECSXP, 2));
+      ++unprotect;
+      SET_VECTOR_ELT(dimnames, 0, R_NilValue);
+    }
+    SET_VECTOR_ELT(dimnames, 1, cnames);
+    setAttrib(r_object, R_DimNamesSymbol, dimnames);
+    UNPROTECT(unprotect);
+  }
+
+  template<typename RTYPE>
+  template<typename T>
+  void setRownames(T beg, T end) {
+    SEXP r_object, dimnames, rnames;
+    int unprotect = 0;
+
+    r_object = handle_->getRobject();
+
+    const int cn_size = static_cast<const int>(std::distance(beg,end));
+
+    if(cn_size!=ncols(r_object)) {
+      return;
+    }
+
+    PROTECT(rnames = string2sexp(beg,end));
+    ++unprotect;
+
+    // check if we have existing dimnames
+    dimnames = getAttrib(r_object, R_DimNamesSymbol);
+    if(dimnames == R_NilValue) {
+      PROTECT(dimnames = allocVector(VECSXP, 2));
+      ++unprotect;
+      SET_VECTOR_ELT(dimnames, 1, R_NilValue);
+    }
+    SET_VECTOR_ELT(dimnames, 0, rnames);
+    setAttrib(r_object, R_DimNamesSymbol, dimnames);
+    UNPROTECT(unprotect);
+  }
+
+  template<typename RTYPE>
+  template<typename T>
+  void getColnames(T insert_iter) {
+    SEXP r_object, dimnames, cnames;
+
+    r_object = handle_->getRobject();
+
+    dimnames = getAttrib(x, R_DimNamesSymbol);
+
+    if(dimnames==R_NilValue) {
+      return;
+    }
+
+    cnames = VECTOR_ELT(dimnames, 1);
+
+    if(cnames==R_NilValue) {
+      return;
+    }
+
+    sexp2string(cnames,insert_iter);
+  }
+
+  template<typename RTYPE>
+  template<typename T>
+  void getRownames(T insert_iter) {
+    SEXP r_object, dimnames, rnames;
+
+    r_object = handle_->getRobject();
+
+    dimnames = getAttrib(x, R_DimNamesSymbol);
+
+    if(dimnames==R_NilValue) {
+      return;
+    }
+
+    rnames = VECTOR_ELT(dimnames, 0);
+
+    if(rnames==R_NilValue) {
+      return;
+    }
+
+    sexp2string(rnames,insert_iter);
+  }
+
+
+  template<typename RTYPE>
+  ValueType& operator()(const R_len_t i, const R_len_t j) {
+    SEXP r_object;
+    ValueType hat;
+    r_object = handle_->getRobject();
+    Rprintf("not implemented yet.\n");
+    return *hat;
   }
 
 } // namespace RAbstraction
