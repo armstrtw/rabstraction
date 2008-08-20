@@ -27,6 +27,8 @@ namespace RAbstraction {
 
   template<SEXPTYPE RTYPE>
   class RVector : public Robject<RTYPE> {
+    using RObject<RTYPE>::handle_;
+    using RObject<RTYPE>::ValueType;
   public:
     typedef typename Rtype<RTYPE>::ValueType ValueType;
     ~RVector();

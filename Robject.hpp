@@ -26,6 +26,7 @@ namespace RAbstraction {
   template<SEXPTYPE RTYPE>
   class RObject {
   public:
+    typedef typename Rtype<RTYPE>::ValueType ValueType;
     Rbackend<RTYPE>* handle_;
     ~RObject();
     RObject();

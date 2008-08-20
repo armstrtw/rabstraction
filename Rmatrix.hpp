@@ -28,15 +28,16 @@ namespace RAbstraction {
   template<SEXPTYPE RTYPE>
   class RMatrix : public RObject<RTYPE> {
     using RObject<RTYPE>::handle_;
+    using RObject<RTYPE>::ValueType;
+    R_len_t element_index(R_len_t row, R_len_t col);
   public:
-    //typedef Rtype<template RTYPE>::ValueType ValueType;
     ~RMatrix();
     RMatrix();
     RMatrix(const R_len_t rows, const R_len_t cols);
     RMatrix(const SEXP x);
 
-    const R_len_t rows();
-    const R_len_t cols();
+    const R_len_t nrow();
+    const R_len_t ncol();
 
     template<typename T>
     void setColnames(T beg, T end);
@@ -50,7 +51,7 @@ namespace RAbstraction {
     template<typename T>
     void getRownames(T insert_iter);
 
-    //ValueType operator()(const R_len_t m, const R_len_t n);
+    typename RObject<RTYPE>::ValueType operator()(const R_len_t m, const R_len_t n);
   };
 
   template<SEXPTYPE RTYPE>
@@ -82,12 +83,12 @@ namespace RAbstraction {
   RMatrix<RTYPE>::RMatrix(const SEXP x) : RObject<RTYPE>(x) {}
 
   template<SEXPTYPE RTYPE>
-  const R_len_t RMatrix<RTYPE>::rows() {
+  const R_len_t RMatrix<RTYPE>::nrow() {
     return nrows(handle_->getRObject());
   }
 
   template<SEXPTYPE RTYPE>
-  const R_len_t RMatrix<RTYPE>::cols() {
+  const R_len_t RMatrix<RTYPE>::ncol() {
     return nrows(handle_->getRObject());
   }
 
@@ -193,16 +194,16 @@ namespace RAbstraction {
     sexp2string(rnames,insert_iter);
   }
 
+  template<SEXPTYPE RTYPE>
+  typename RObject<RTYPE>::ValueType RMatrix<RTYPE>::operator()(const R_len_t i, const R_len_t j) {
+    SEXP r_object = handle_->getRObject();
+    return Rtype<RTYPE>::index(r_object, element_index(i,j));
+  }
 
-//   template<SEXPTYPE RTYPE>
-//   ValueType& operator()(const R_len_t i, const R_len_t j) {
-//     SEXP r_object;
-//     ValueType hat;
-//     r_object = handle_->getRObject();
-//     Rprintf("not implemented yet.\n");
-//     return *hat;
-//   }
-
+  template<SEXPTYPE RTYPE>
+  R_len_t RMatrix<RTYPE>::element_index(R_len_t row, R_len_t col) {
+    return row + ncol() * col;
+  }
 } // namespace RAbstraction
 
 #endif //RMATRIX_HPP

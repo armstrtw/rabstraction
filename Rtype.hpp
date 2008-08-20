@@ -33,6 +33,9 @@ public:
   static double scalar(SEXP x) {
     return REAL(x)[0];
   }
+  static double index(SEXP x, R_len_t i) {
+    return REAL(x)[i];
+  }
 };
 
 template<>
@@ -42,6 +45,9 @@ public:
   static int scalar(SEXP x) {
     return INTEGER(x)[0];
   }
+  static int index(SEXP x, R_len_t i) {
+    return INTEGER(x)[i];
+  }
 };
 
 template<>
@@ -49,7 +55,10 @@ class Rtype<LGLSXP> {
 public:
   typedef int ValueType;
   static int scalar(SEXP x) {
-    return INTEGER(x)[0];
+    return LOGICAL(x)[0];
+  }
+  static int index(SEXP x, R_len_t i) {
+    return LOGICAL(x)[i];
   }
 };
 
@@ -59,6 +68,10 @@ public:
   typedef string ValueType;
   static string scalar(SEXP x) {
     string ans(CHAR(STRING_ELT(x, 0)));
+    return ans;
+  }
+  static string index(SEXP x, R_len_t i) {
+    string ans(CHAR(STRING_ELT(x, i)));
     return ans;
   }
 };
