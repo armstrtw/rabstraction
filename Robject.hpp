@@ -25,31 +25,40 @@ namespace RAbstraction {
 
   template<typename RTYPE>
   class RObject {
-  private:
-    Rbackend<RTYPE>* handle_;
   public:
+    Rbackend<RTYPE>* handle_;
     ~RObject();
     RObject();
     RObject(const R_len_t len);
     RObject(const SEXP x);
 
     const R_len_t length();
+    const SEXP getSEXP();
   };
 
-  ~RObject<RTYPE>::RObject() {
+  template<typename RTYPE>
+  RObject<RTYPE>::~RObject() {
     handle_->detach();
   }
 
+  template<typename RTYPE>
   RObject<RTYPE>::RObject() {
     handle_ = Rbackend<RTYPE>::init();
   }
 
+  template<typename RTYPE>
   RObject<RTYPE>::RObject(const R_len_t len) {
     handle_ = Rbackend<RTYPE>::init(len);
   }
 
+  template<typename RTYPE>
   RObject<RTYPE>::RObject(const SEXP x) {
     handle_ = Rbackend<RTYPE>::init(x);
+  }
+
+  template<typename RTYPE>
+  const SEXP RObject<RTYPE>::getSEXP() {
+    return handle_->getRObject();
   }
 } // namespace RAbstraction
 

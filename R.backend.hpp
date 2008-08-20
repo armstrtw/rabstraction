@@ -21,6 +21,7 @@
 #include <Rinternals.h>
 #include <Rsexp.allocator.templates.hpp>
 #include <Rutilities.hpp>
+#include <Rtype.hpp>
 
 namespace RAbstraction {
 
@@ -39,7 +40,7 @@ namespace RAbstraction {
     Rbackend(const Rbackend& t);
     Rbackend& operator=(const Rbackend& right);
   public:
-    typedef ValueType Rtype<RTYPE>::ValueType;
+    //typedef Rtype<typename RTYPE>::ValueType ValueType;
 
     ~Rbackend();
 
@@ -55,7 +56,7 @@ namespace RAbstraction {
     const SEXP fetchAttribute(const char* attrubuteName);
     const SEXP fetchAttribute(const SEXP attrubuteSymbol);
 
-    const SEXP getRobject();
+    const SEXP getRObject();
   };
 
   template<typename RTYPE>
@@ -77,30 +78,33 @@ namespace RAbstraction {
     // all R data objects are vectors
     // just add dim attribute if you need a matrix
     // destructor is responsible for calling UNPROTECT on this object
-    PROTECT(R_object_ = R_allocator<TYPE>::Vector(length));
+    PROTECT(R_object_ = R_allocator<RTYPE>::Vector(length));
   }
 
   template <typename RTYPE>
   Rbackend<RTYPE>::Rbackend(const SEXP x) : refcount_(1), release_data_(false), R_object_(x) {
     // release_data_(false): do not release data (presumably) already allocated in R session
+    //FIXME:
+    /*
     if(TYPEOF(x) != RTYPE) {
       R_object_ = R_NilValue;
       Rprintf("template type does not match argument");
     }
+    */
   }
 
   template<typename RTYPE>
-  Rbackend* Rbackend<RTYPE>::init() {
+  Rbackend<RTYPE>* Rbackend<RTYPE>::init() {
     return new Rbackend();
   }
 
   template<typename RTYPE>
-  Rbackend* Rbackend<RTYPE>::init(const R_len_t length) {
+  Rbackend<RTYPE>* Rbackend<RTYPE>::init(const R_len_t length) {
     return new Rbackend(length);
   }
 
   template<typename RTYPE>
-  Rbackend* Rbackend<RTYPE>::init(const SEXP x) {
+  Rbackend<RTYPE>* Rbackend<RTYPE>::init(const SEXP x) {
     return new Rbackend(x);
   }
 
@@ -117,7 +121,7 @@ namespace RAbstraction {
   }
 
   template<typename RTYPE>
-  void Rbackend::setAttribute(const char* attrubuteName, const SEXP attributeValue) {
+  void Rbackend<RTYPE>::setAttribute(const char* attrubuteName, const SEXP attributeValue) {
     if(R_object_==R_NilValue || attributeValue==R_NilValue) {
       Rprintf("could not set attribute.\n");
       return;
@@ -126,7 +130,7 @@ namespace RAbstraction {
   }
 
   template<typename RTYPE>
-  void Rbackend::setAttribute(const SEXP attrubuteSymbol, const SEXP attributeValue) {
+  void Rbackend<RTYPE>::setAttribute(const SEXP attrubuteSymbol, const SEXP attributeValue) {
     if(R_object_==R_NilValue || attrubuteSymbol == R_NilValue || attributeValue==R_NilValue) {
       Rprintf("could not set attribute.\n");
       return;
@@ -136,7 +140,7 @@ namespace RAbstraction {
 
 
   template<typename RTYPE>
-  const SEXP Rbackend::fetchAttribute(const char* attrubuteName) {
+  const SEXP Rbackend<RTYPE>::fetchAttribute(const char* attrubuteName) {
     if(R_object_==R_NilValue) {
       Rprintf("could not fetch attribute on uninitialized R_Object.\n");
       return;
@@ -145,7 +149,7 @@ namespace RAbstraction {
   }
 
   template<typename RTYPE>
-  const SEXP Rbackend::fetchAttribute(const SEXP attrubuteSymbol) {
+  const SEXP Rbackend<RTYPE>::fetchAttribute(const SEXP attrubuteSymbol) {
     if(R_object_==R_NilValue) {
       Rprintf("could not fetch attribute on uninitialized R_Object.\n");
       return;
@@ -154,7 +158,7 @@ namespace RAbstraction {
   }
 
   template<typename RTYPE>
-  const SEXP getRobject() {
+  const SEXP Rbackend<RTYPE>::getRObject() {
     return R_object_;
   }
 } // namespace RAbstraction

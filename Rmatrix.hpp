@@ -26,9 +26,9 @@
 namespace RAbstraction {
 
   template<typename RTYPE>
-  class RMatrix : public Robject<RTYPE> {
+  class RMatrix : public RObject<RTYPE> {
   public:
-    typedef typename Rtype<RTYPE>::ValueType ValueType;
+    //typedef Rtype<template RTYPE>::ValueType ValueType;
     ~RMatrix();
     RMatrix();
     RMatrix(const R_len_t rows, const R_len_t cols);
@@ -49,24 +49,23 @@ namespace RAbstraction {
     template<typename T>
     void getRownames(T insert_iter);
 
-    ValueType operator()(const R_len_t m, const R_len_t n);
+    //ValueType operator()(const R_len_t m, const R_len_t n);
   };
 
   template<typename RTYPE>
-  ~RMatrix<RTYPE>::RMatrix() {}
-  // now handled by Robject -- handle_->detach();
+  RMatrix<RTYPE>::~RMatrix() {}
 
   template<typename RTYPE>
-  RMatrix<RTYPE>::RMatrix() : Robject() {}
+  RMatrix<RTYPE>::RMatrix() : RObject<RTYPE>() {}
 
   template<typename RTYPE>
-  RMatrix<RTYPE>::RMatrix(R_len_t rows, R_len_t cols) : Robject(rows*cols) {
-    SEXP dim_attribute;
+  RMatrix<RTYPE>::RMatrix(R_len_t rows, R_len_t cols) : RObject<RTYPE>(rows*cols) {
+    SEXP dims;
 
     // check overflow
     if(static_cast<double>(rows) * static_cast<double>(cols) > INT_MAX) {
-      handle_->detach();
-      handle_ = Rbackend<RTYPE>::init();
+      this.handle_->detach();
+      this.handle_ = Rbackend<RTYPE>::init();
       Rprintf("matrix dimensions too big.\n");
   }
 
@@ -74,30 +73,30 @@ namespace RAbstraction {
     PROTECT(dims = allocVector(INTSXP, 2));
     INTEGER(dims)[0] = rows;
     INTEGER(dims)[1] = cols;
-    setAttrib(handle_, R_DimSymbol, dims);
+    setAttrib(this.handle_, R_DimSymbol, dims);
     UNPROTECT(1); // dims
   }
 
   template<typename RTYPE>
-  RMatrix<RTYPE>::RMatrix(const SEXP x) : Robject(x) {}
+  RMatrix<RTYPE>::RMatrix(const SEXP x) : RObject<RTYPE>(x) {}
 
   template<typename RTYPE>
-  const R_len_t rows() {
-    return nrows(handle_->getRobject());
+  const R_len_t RMatrix<RTYPE>::rows() {
+    return nrows(this.handle_->getRObject());
   }
 
   template<typename RTYPE>
-  const R_len_t cols() {
-    return nrows(handle_->getRobject());
+  const R_len_t RMatrix<RTYPE>::cols() {
+    return nrows(this.handle_->getRObject());
   }
 
   template<typename RTYPE>
   template<typename T>
-  void setColnames(T beg, T end) {
+  void RMatrix<RTYPE>::setColnames(T beg, T end) {
     SEXP r_object, dimnames, cnames;
-    int unprotect = 0;
+    int protect_count = 0;
 
-    r_object = handle_->getRobject();
+    r_object = this.handle_->getRObject();
 
     const int cn_size = static_cast<const int>(std::distance(beg,end));
 
@@ -106,27 +105,27 @@ namespace RAbstraction {
     }
 
     PROTECT(cnames = string2sexp(beg,end));
-    ++unprotect;
+    ++protect_count;
 
     // check if we have existing dimnames
     dimnames = getAttrib(r_object, R_DimNamesSymbol);
     if(dimnames == R_NilValue) {
       PROTECT(dimnames = allocVector(VECSXP, 2));
-      ++unprotect;
+      ++protect_count;
       SET_VECTOR_ELT(dimnames, 0, R_NilValue);
     }
     SET_VECTOR_ELT(dimnames, 1, cnames);
     setAttrib(r_object, R_DimNamesSymbol, dimnames);
-    UNPROTECT(unprotect);
+    UNPROTECT(protect_count);
   }
 
   template<typename RTYPE>
   template<typename T>
-  void setRownames(T beg, T end) {
+  void RMatrix<RTYPE>::setRownames(T beg, T end) {
     SEXP r_object, dimnames, rnames;
-    int unprotect = 0;
+    int protect_count = 0;
 
-    r_object = handle_->getRobject();
+    r_object = this.handle_->getRObject();
 
     const int cn_size = static_cast<const int>(std::distance(beg,end));
 
@@ -135,28 +134,28 @@ namespace RAbstraction {
     }
 
     PROTECT(rnames = string2sexp(beg,end));
-    ++unprotect;
+    ++protect_count;
 
     // check if we have existing dimnames
     dimnames = getAttrib(r_object, R_DimNamesSymbol);
     if(dimnames == R_NilValue) {
       PROTECT(dimnames = allocVector(VECSXP, 2));
-      ++unprotect;
+      ++protect_count;
       SET_VECTOR_ELT(dimnames, 1, R_NilValue);
     }
     SET_VECTOR_ELT(dimnames, 0, rnames);
     setAttrib(r_object, R_DimNamesSymbol, dimnames);
-    UNPROTECT(unprotect);
+    UNPROTECT(protect_count);
   }
 
   template<typename RTYPE>
   template<typename T>
-  void getColnames(T insert_iter) {
+  void RMatrix<RTYPE>::getColnames(T insert_iter) {
     SEXP r_object, dimnames, cnames;
 
-    r_object = handle_->getRobject();
+    r_object = this.handle_->getRObject();
 
-    dimnames = getAttrib(x, R_DimNamesSymbol);
+    dimnames = getAttrib(r_object, R_DimNamesSymbol);
 
     if(dimnames==R_NilValue) {
       return;
@@ -173,12 +172,12 @@ namespace RAbstraction {
 
   template<typename RTYPE>
   template<typename T>
-  void getRownames(T insert_iter) {
+  void RMatrix<RTYPE>::getRownames(T insert_iter) {
     SEXP r_object, dimnames, rnames;
 
-    r_object = handle_->getRobject();
+    r_object = this.handle_->getRObject();
 
-    dimnames = getAttrib(x, R_DimNamesSymbol);
+    dimnames = getAttrib(r_object, R_DimNamesSymbol);
 
     if(dimnames==R_NilValue) {
       return;
@@ -194,14 +193,14 @@ namespace RAbstraction {
   }
 
 
-  template<typename RTYPE>
-  ValueType& operator()(const R_len_t i, const R_len_t j) {
-    SEXP r_object;
-    ValueType hat;
-    r_object = handle_->getRobject();
-    Rprintf("not implemented yet.\n");
-    return *hat;
-  }
+//   template<typename RTYPE>
+//   ValueType& operator()(const R_len_t i, const R_len_t j) {
+//     SEXP r_object;
+//     ValueType hat;
+//     r_object = this.handle_->getRObject();
+//     Rprintf("not implemented yet.\n");
+//     return *hat;
+//   }
 
 } // namespace RAbstraction
 

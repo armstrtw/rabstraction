@@ -18,6 +18,8 @@
 #ifndef RUTILTIES_HPP
 #define RUTILTIES_HPP
 
+
+#include <string>
 #include <Rinternals.h>
 
 template<typename T>
