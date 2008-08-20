@@ -23,7 +23,7 @@
 
 namespace RAbstraction {
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   class RObject {
   public:
     Rbackend<RTYPE>* handle_;
@@ -36,27 +36,27 @@ namespace RAbstraction {
     const SEXP getSEXP();
   };
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   RObject<RTYPE>::~RObject() {
     handle_->detach();
   }
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   RObject<RTYPE>::RObject() {
     handle_ = Rbackend<RTYPE>::init();
   }
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   RObject<RTYPE>::RObject(const R_len_t len) {
     handle_ = Rbackend<RTYPE>::init(len);
   }
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   RObject<RTYPE>::RObject(const SEXP x) {
     handle_ = Rbackend<RTYPE>::init(x);
   }
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   const SEXP RObject<RTYPE>::getSEXP() {
     return handle_->getRObject();
   }

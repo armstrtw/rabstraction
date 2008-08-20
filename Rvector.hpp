@@ -25,7 +25,7 @@
 
 namespace RAbstraction {
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   class RVector : public Robject<RTYPE> {
   public:
     typedef typename Rtype<RTYPE>::ValueType ValueType;
@@ -45,25 +45,25 @@ namespace RAbstraction {
     ValueType operator()(const R_len_t i);
   };
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   ~RVector<RTYPE>::RVector() {}
   // now handled by Robject -- handle_->detach();
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   RVector<RTYPE>::RVector() : Robject() {}
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   RVector<RTYPE>::RVector(R_len_t length) : Robject(length) {}
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   RVector<RTYPE>::RVector(const SEXP x) : Robject(x) {}
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   const R_len_t length() {
     return length(handle_->getRobject());
   }
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   template<typename T>
   void setNames(T beg, T end) {
     SEXP r_object, r_object_names, new_names;
@@ -85,7 +85,7 @@ namespace RAbstraction {
   }
 
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   template<typename T>
   void getNames(T insert_iter) {
     SEXP r_object, r_object_names, cnames;
@@ -100,7 +100,7 @@ namespace RAbstraction {
   }
 
 
-  template<typename RTYPE>
+  template<SEXPTYPE RTYPE>
   ValueType& operator()(const R_len_t i, const R_len_t j) {
     SEXP r_object;
     ValueType hat;
