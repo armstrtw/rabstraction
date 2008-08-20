@@ -29,15 +29,15 @@ namespace RAbstraction {
   class RMatrix : public RObject<RTYPE> {
     using RObject<RTYPE>::handle_;
     using RObject<RTYPE>::ValueType;
-    R_len_t element_index(R_len_t row, R_len_t col);
+    const R_len_t element_index(const R_len_t row, const R_len_t col) const;
   public:
     ~RMatrix();
     RMatrix();
     RMatrix(const R_len_t rows, const R_len_t cols);
     RMatrix(const SEXP x);
 
-    const R_len_t nrow();
-    const R_len_t ncol();
+    const R_len_t nrow() const;
+    const R_len_t ncol() const;
 
     template<typename T>
     void setColnames(T beg, T end);
@@ -46,12 +46,12 @@ namespace RAbstraction {
     void setRownames(T beg, T end);
 
     template<typename T>
-    void getColnames(T insert_iter);
+    void getColnames(T insert_iter) const;
 
     template<typename T>
-    void getRownames(T insert_iter);
+    void getRownames(T insert_iter) const;
 
-    typename RObject<RTYPE>::ValueType operator()(const R_len_t m, const R_len_t n);
+    typename RObject<RTYPE>::ValueType operator()(const R_len_t m, const R_len_t n) const;
   };
 
   template<SEXPTYPE RTYPE>
@@ -61,7 +61,7 @@ namespace RAbstraction {
   RMatrix<RTYPE>::RMatrix() : RObject<RTYPE>() {}
 
   template<SEXPTYPE RTYPE>
-  RMatrix<RTYPE>::RMatrix(R_len_t rows, R_len_t cols) : RObject<RTYPE>(rows*cols) {
+  RMatrix<RTYPE>::RMatrix(const R_len_t rows, const R_len_t cols) : RObject<RTYPE>(rows*cols) {
     SEXP dims;
 
     // check overflow
@@ -83,12 +83,12 @@ namespace RAbstraction {
   RMatrix<RTYPE>::RMatrix(const SEXP x) : RObject<RTYPE>(x) {}
 
   template<SEXPTYPE RTYPE>
-  const R_len_t RMatrix<RTYPE>::nrow() {
+  const R_len_t RMatrix<RTYPE>::nrow() const {
     return nrows(handle_->getRObject());
   }
 
   template<SEXPTYPE RTYPE>
-  const R_len_t RMatrix<RTYPE>::ncol() {
+  const R_len_t RMatrix<RTYPE>::ncol() const {
     return nrows(handle_->getRObject());
   }
 
@@ -152,7 +152,7 @@ namespace RAbstraction {
 
   template<SEXPTYPE RTYPE>
   template<typename T>
-  void RMatrix<RTYPE>::getColnames(T insert_iter) {
+  void RMatrix<RTYPE>::getColnames(T insert_iter) const {
     SEXP r_object = handle_->getRObject();
     SEXP dimnames = getAttrib(r_object, R_DimNamesSymbol);
 
@@ -171,7 +171,7 @@ namespace RAbstraction {
 
   template<SEXPTYPE RTYPE>
   template<typename T>
-  void RMatrix<RTYPE>::getRownames(T insert_iter) {
+  void RMatrix<RTYPE>::getRownames(T insert_iter) const {
 
     SEXP r_object = handle_->getRObject();
     SEXP dimnames = getAttrib(r_object, R_DimNamesSymbol);
@@ -190,13 +190,13 @@ namespace RAbstraction {
   }
 
   template<SEXPTYPE RTYPE>
-  typename RObject<RTYPE>::ValueType RMatrix<RTYPE>::operator()(const R_len_t i, const R_len_t j) {
+  typename RObject<RTYPE>::ValueType RMatrix<RTYPE>::operator()(const R_len_t i, const R_len_t j) const {
     SEXP r_object = handle_->getRObject();
     return Rtype<RTYPE>::index(r_object, element_index(i,j));
   }
 
   template<SEXPTYPE RTYPE>
-  R_len_t RMatrix<RTYPE>::element_index(R_len_t row, R_len_t col) {
+  const R_len_t RMatrix<RTYPE>::element_index(const R_len_t row, const R_len_t col) const {
     return row + ncol() * col;
   }
 } // namespace RAbstraction
