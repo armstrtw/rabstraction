@@ -124,10 +124,10 @@ namespace RAbstraction {
   template<SEXPTYPE RTYPE>
   template<typename T>
   void RMatrix<RTYPE>::setRownames(T beg, T end) {
-    SEXP r_object, dimnames, rnames;
+    SEXP rnames;
     int protect_count = 0;
 
-    r_object = handle_->getRObject();
+    SEXP r_object = handle_->getRObject();
 
     const int cn_size = static_cast<const int>(std::distance(beg,end));
 
@@ -139,7 +139,7 @@ namespace RAbstraction {
     ++protect_count;
 
     // check if we have existing dimnames
-    dimnames = getAttrib(r_object, R_DimNamesSymbol);
+    SEXP dimnames = getAttrib(r_object, R_DimNamesSymbol);
     if(dimnames == R_NilValue) {
       PROTECT(dimnames = allocVector(VECSXP, 2));
       ++protect_count;
@@ -153,17 +153,14 @@ namespace RAbstraction {
   template<SEXPTYPE RTYPE>
   template<typename T>
   void RMatrix<RTYPE>::getColnames(T insert_iter) {
-    SEXP r_object, dimnames, cnames;
-
-    r_object = handle_->getRObject();
-
-    dimnames = getAttrib(r_object, R_DimNamesSymbol);
+    SEXP r_object = handle_->getRObject();
+    SEXP dimnames = getAttrib(r_object, R_DimNamesSymbol);
 
     if(dimnames==R_NilValue) {
       return;
     }
 
-    cnames = VECTOR_ELT(dimnames, 1);
+    SEXP cnames = VECTOR_ELT(dimnames, 1);
 
     if(cnames==R_NilValue) {
       return;
@@ -175,17 +172,15 @@ namespace RAbstraction {
   template<SEXPTYPE RTYPE>
   template<typename T>
   void RMatrix<RTYPE>::getRownames(T insert_iter) {
-    SEXP r_object, dimnames, rnames;
 
-    r_object = handle_->getRObject();
-
-    dimnames = getAttrib(r_object, R_DimNamesSymbol);
+    SEXP r_object = handle_->getRObject();
+    SEXP dimnames = getAttrib(r_object, R_DimNamesSymbol);
 
     if(dimnames==R_NilValue) {
       return;
     }
 
-    rnames = VECTOR_ELT(dimnames, 0);
+    SEXP rnames = VECTOR_ELT(dimnames, 0);
 
     if(rnames==R_NilValue) {
       return;
