@@ -51,11 +51,6 @@ namespace RAbstraction {
     void attach();
     void detach();
 
-    void setAttribute(const SEXP attrubuteSymbol, const SEXP attributeValue);
-    void setAttribute(const char* attrubuteName, const SEXP attributeValue);
-    const SEXP fetchAttribute(const char* attrubuteName);
-    const SEXP fetchAttribute(const SEXP attrubuteSymbol);
-
     const SEXP getRObject();
   };
 
@@ -119,43 +114,6 @@ namespace RAbstraction {
     if(--refcount_ == 0) {
       delete this;
     }
-  }
-
-  template<SEXPTYPE RTYPE>
-  void Rbackend<RTYPE>::setAttribute(const char* attrubuteName, const SEXP attributeValue) {
-    if(R_object_==R_NilValue || attributeValue==R_NilValue) {
-      Rprintf("could not set attribute.\n");
-      return;
-    }
-    setAttrib(R_object_,install(attrubuteName),attributeValue);
-  }
-
-  template<SEXPTYPE RTYPE>
-  void Rbackend<RTYPE>::setAttribute(const SEXP attrubuteSymbol, const SEXP attributeValue) {
-    if(R_object_==R_NilValue || attrubuteSymbol == R_NilValue || attributeValue==R_NilValue) {
-      Rprintf("could not set attribute.\n");
-      return;
-    }
-    setAttrib(R_object_,attrubuteSymbol,attributeValue);
-  }
-
-
-  template<SEXPTYPE RTYPE>
-  const SEXP Rbackend<RTYPE>::fetchAttribute(const char* attrubuteName) {
-    if(R_object_==R_NilValue) {
-      Rprintf("could not fetch attribute on uninitialized R_Object.\n");
-      return;
-    }
-    return getAttrib(R_object_,install(attrubuteName));
-  }
-
-  template<SEXPTYPE RTYPE>
-  const SEXP Rbackend<RTYPE>::fetchAttribute(const SEXP attrubuteSymbol) {
-    if(R_object_==R_NilValue) {
-      Rprintf("could not fetch attribute on uninitialized R_Object.\n");
-      return;
-    }
-    return getAttrib(R_object_, attrubuteSymbol);
   }
 
   template<SEXPTYPE RTYPE>
