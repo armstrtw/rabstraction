@@ -73,4 +73,26 @@ public:
   }
 };
 
+template<>
+class R_allocator<bool> {
+public:
+  static SEXP Matrix(const int nr, const int nc) {
+    SEXP ans = allocMatrix(LOGICAL,nr,nc);
+    return ans;
+  }
+
+  static SEXP Vector(const int len) {
+    SEXP ans = allocVector(INTSXP,len);
+    return ans;
+  }
+
+  static int* R_dataPtr(const SEXP x) {
+    return LOGICAL(x);
+  }
+
+  static int scalar(const SEXP x) {
+    return LOGICAL(x)[0];
+  }
+};
+
 #endif // RSEXP_ALLOCATOR_TEMPLATES_HPP
