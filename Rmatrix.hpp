@@ -29,7 +29,7 @@ namespace RAbstraction {
   class RMatrix : public RObject<RTYPE> {
     using RObject<RTYPE>::handle_;
     using RObject<RTYPE>::ValueType;
-    const R_len_t element_index(const R_len_t row, const R_len_t col) const;
+    const R_len_t matrix_index(const R_len_t row, const R_len_t col) const;
   public:
     ~RMatrix();
     RMatrix();
@@ -192,11 +192,11 @@ namespace RAbstraction {
   template<SEXPTYPE RTYPE>
   typename RObject<RTYPE>::ValueType RMatrix<RTYPE>::operator()(const R_len_t i, const R_len_t j) const {
     SEXP r_object = handle_->getRObject();
-    return Rtype<RTYPE>::index(r_object, element_index(i,j));
+    return Rtype<RTYPE>::index(r_object, matrix_index(i,j));
   }
 
   template<SEXPTYPE RTYPE>
-  const R_len_t RMatrix<RTYPE>::element_index(const R_len_t row, const R_len_t col) const {
+  const R_len_t RMatrix<RTYPE>::matrix_index(const R_len_t row, const R_len_t col) const {
     return row + ncol() * col;
   }
 } // namespace RAbstraction
