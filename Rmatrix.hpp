@@ -51,7 +51,7 @@ namespace RAbstraction {
     template<typename T>
     void getRownames(T insert_iter) const;
 
-    typename RObject<RTYPE>::ValueType operator()(const R_len_t m, const R_len_t n) const;
+    typename RObject<RTYPE>::ValueType& operator()(const R_len_t m, const R_len_t n);
   };
 
   template<SEXPTYPE RTYPE>
@@ -190,7 +190,7 @@ namespace RAbstraction {
   }
 
   template<SEXPTYPE RTYPE>
-  typename RObject<RTYPE>::ValueType RMatrix<RTYPE>::operator()(const R_len_t i, const R_len_t j) const {
+  typename RObject<RTYPE>::ValueType& RMatrix<RTYPE>::operator()(const R_len_t i, const R_len_t j) {
     SEXP r_object = handle_->getRObject();
     return Rtype<RTYPE>::index(r_object, matrix_index(i,j));
   }

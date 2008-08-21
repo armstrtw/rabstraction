@@ -30,10 +30,10 @@ template<>
 class Rtype<REALSXP> {
 public:
   typedef double ValueType;
-  static double scalar(SEXP x) {
+  static double& scalar(SEXP x) {
     return REAL(x)[0];
   }
-  static double index(SEXP x, R_len_t i) {
+  static double& index(SEXP x, R_len_t i) {
     return REAL(x)[i];
   }
 };
@@ -42,10 +42,10 @@ template<>
 class Rtype<INTSXP> {
 public:
   typedef int ValueType;
-  static int scalar(SEXP x) {
+  static int& scalar(SEXP x) {
     return INTEGER(x)[0];
   }
-  static int index(SEXP x, R_len_t i) {
+  static int& index(SEXP x, R_len_t i) {
     return INTEGER(x)[i];
   }
 };
@@ -54,10 +54,10 @@ template<>
 class Rtype<LGLSXP> {
 public:
   typedef int ValueType;
-  static int scalar(SEXP x) {
+  static int& scalar(SEXP x) {
     return LOGICAL(x)[0];
   }
-  static int index(SEXP x, R_len_t i) {
+  static int& index(SEXP x, R_len_t i) {
     return LOGICAL(x)[i];
   }
 };
