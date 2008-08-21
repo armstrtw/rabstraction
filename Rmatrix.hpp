@@ -89,7 +89,7 @@ namespace RAbstraction {
 
   template<SEXPTYPE RTYPE>
   const R_len_t RMatrix<RTYPE>::ncol() const {
-    return nrows(handle_->getRObject());
+    return ncols(handle_->getRObject());
   }
 
   template<SEXPTYPE RTYPE>
