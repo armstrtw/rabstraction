@@ -77,12 +77,12 @@ template<>
 class R_allocator<bool> {
 public:
   static SEXP Matrix(const int nr, const int nc) {
-    SEXP ans = allocMatrix(LOGICAL,nr,nc);
+    SEXP ans = allocMatrix(LGLSXP,nr,nc);
     return ans;
   }
 
   static SEXP Vector(const int len) {
-    SEXP ans = allocVector(INTSXP,len);
+    SEXP ans = allocVector(LGLSXP,len);
     return ans;
   }
 
