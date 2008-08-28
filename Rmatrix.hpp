@@ -197,7 +197,7 @@ namespace RAbstraction {
 
   template<SEXPTYPE RTYPE>
   const R_len_t RMatrix<RTYPE>::matrix_index(const R_len_t row, const R_len_t col) const {
-    return row + ncol() * col;
+    return row + nrow() * col;
   }
 } // namespace RAbstraction
 
