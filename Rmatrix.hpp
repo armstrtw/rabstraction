@@ -19,7 +19,6 @@
 #define RMATRIX_HPP
 
 #include <Rinternals.h>
-#include <R.backend.hpp>
 #include <Robject.hpp>
 #include <Rutilities.hpp>
 
