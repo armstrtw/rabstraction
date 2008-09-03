@@ -39,6 +39,12 @@ namespace RAbstraction {
     const SEXP fetchAttribute(const SEXP attrubuteSymbol);
 
     const R_len_t length();
+
+    template<typename T>
+    void setClass(T beg, T end);
+
+    void setClass(const char* cls);
+
     const SEXP getSEXP();
   };
 
@@ -98,6 +104,30 @@ namespace RAbstraction {
     }
     return getAttrib(getSEXP(), attrubuteSymbol);
   }
+
+  template<SEXPTYPE RTYPE>
+  template<typename T>
+  void RObject<RTYPE>::setClass(T beg, T end) {
+    SEXP classes;
+    SEXP r_object = handle_->getRObject();
+
+    PROTECT(classes = string2sexp(beg,end));
+    classgets(r_object,classes);
+    UNPROTECT(1);
+  }
+
+  template<SEXPTYPE RTYPE>
+  void RObject<RTYPE>::setClass(const char* cls) {
+    SEXP cls_sexp;
+    SEXP r_object = handle_->getRObject();
+
+    PROTECT(cls_sexp = allocVector(STRSXP,1));
+    SET_STRING_ELT(cls_sexp, 0, mkChar(cls));
+
+    classgets(r_object,cls_sexp);
+    UNPROTECT(1);
+  }
+
 
   template<SEXPTYPE RTYPE>
   const SEXP RObject<RTYPE>::getSEXP() {
