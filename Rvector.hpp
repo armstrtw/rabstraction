@@ -19,24 +19,22 @@
 #define RVECTOR_HPP
 
 #include <Rinternals.h>
-#include <R.backend.hpp>
 #include <Robject.hpp>
 #include <Rutilities.hpp>
 
 namespace RAbstraction {
 
   template<SEXPTYPE RTYPE>
-  class RVector : public Robject<RTYPE> {
+  class RVector : public RObject<RTYPE> {
     using RObject<RTYPE>::handle_;
     using RObject<RTYPE>::ValueType;
   public:
-    typedef typename Rtype<RTYPE>::ValueType ValueType;
     ~RVector();
     RVector();
-    RVector(const R_len_t length);
+    RVector(const R_len_t len);
     RVector(const SEXP x);
 
-    const R_len_t length();
+    const R_len_t len();
 
     template<typename T>
     void setNames(T beg, T end);
@@ -44,34 +42,34 @@ namespace RAbstraction {
     template<typename T>
     void getNames(T insert_iter);
 
-    ValueType operator()(const R_len_t i);
+    typename RObject<RTYPE>::ValueType& operator[](const R_len_t i);
+    typename RObject<RTYPE>::ValueType& operator()(const R_len_t i);
   };
 
   template<SEXPTYPE RTYPE>
-  ~RVector<RTYPE>::RVector() {}
-  // now handled by Robject -- handle_->detach();
+  RVector<RTYPE>::~RVector() {}
 
   template<SEXPTYPE RTYPE>
-  RVector<RTYPE>::RVector() : Robject() {}
+  RVector<RTYPE>::RVector() : RObject<RTYPE>() {}
 
   template<SEXPTYPE RTYPE>
-  RVector<RTYPE>::RVector(R_len_t length) : Robject(length) {}
+  RVector<RTYPE>::RVector(R_len_t len) : RObject<RTYPE>(len) {}
 
   template<SEXPTYPE RTYPE>
-  RVector<RTYPE>::RVector(const SEXP x) : Robject(x) {}
+  RVector<RTYPE>::RVector(const SEXP x) : RObject<RTYPE>(x) {}
 
   template<SEXPTYPE RTYPE>
-  const R_len_t length() {
-    return length(handle_->getRobject());
+  const R_len_t RVector<RTYPE>::len() {
+    SEXP r_object = handle_->getRObject();
+    return length(r_object);
   }
 
   template<SEXPTYPE RTYPE>
   template<typename T>
-  void setNames(T beg, T end) {
-    SEXP r_object, r_object_names, new_names;
-    int unprotect = 0;
+  void RVector<RTYPE>::setNames(T beg, T end) {
+    SEXP r_object, new_names;
 
-    r_object = handle_->getRobject();
+    r_object = handle_->getRObject();
 
     const int new_names_size = static_cast<const int>(std::distance(beg,end));
 
@@ -80,20 +78,18 @@ namespace RAbstraction {
     }
 
     PROTECT(new_names = string2sexp(beg,end));
-    ++unprotect;
-
     setAttrib(r_object, R_NamesSymbol, new_names);
-    UNPROTECT(unprotect);
+    UNPROTECT(1);
   }
 
 
   template<SEXPTYPE RTYPE>
   template<typename T>
-  void getNames(T insert_iter) {
+  void RVector<RTYPE>::getNames(T insert_iter) {
     SEXP r_object, r_object_names, cnames;
 
-    r_object = handle_->getRobject();
-    r_object_names = getAttrib(x, R_NamesSymbol);
+    r_object = handle_->getRObject();
+    r_object_names = getAttrib(r_object, R_NamesSymbol);
 
     if(r_object_names==R_NilValue) {
       return;
@@ -103,14 +99,19 @@ namespace RAbstraction {
 
 
   template<SEXPTYPE RTYPE>
-  ValueType& operator()(const R_len_t i, const R_len_t j) {
-    SEXP r_object;
-    ValueType hat;
-    r_object = handle_->getRobject();
-    Rprintf("not implemented yet.\n");
-    return *hat;
+  inline
+  typename RObject<RTYPE>::ValueType& RVector<RTYPE>::operator[](const R_len_t i) {
+    SEXP r_object = handle_->getRObject();
+    return Rtype<RTYPE>::index(r_object, i);
   }
 
+  // same as operator[], but implements auto wrapping index (ie index = i % len)
+  template<SEXPTYPE RTYPE>
+  inline
+  typename RObject<RTYPE>::ValueType& RVector<RTYPE>::operator()(const R_len_t i) {
+    SEXP r_object = handle_->getRObject();
+    return Rtype<RTYPE>::index(r_object, i % len());
+  }
 } // namespace RAbstraction
 
 #endif //RVECTOR_HPP
