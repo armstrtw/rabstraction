@@ -21,8 +21,6 @@
 #include <string>
 #include <Rinternals.h>
 
-using std::string;
-
 template<SEXPTYPE T>
 class Rtype;
 
@@ -65,14 +63,12 @@ public:
 template<>
 class Rtype<STRSXP> {
 public:
-  typedef string ValueType;
-  static string scalar(SEXP x) {
-    string ans(CHAR(STRING_ELT(x, 0)));
-    return ans;
+  typedef const char* ValueType;
+  static const char* scalar(SEXP x) {
+    return CHAR(STRING_ELT(x, 0));
   }
-  static string index(SEXP x, R_len_t i) {
-    string ans(CHAR(STRING_ELT(x, i)));
-    return ans;
+  static const char* index(SEXP x, R_len_t i) {
+    return CHAR(STRING_ELT(x, i));
   }
 };
 

@@ -34,15 +34,17 @@ namespace RAbstraction {
     RVector(const R_len_t len);
     RVector(const SEXP x);
 
-    const R_len_t len();
+    const R_len_t len() const;
 
     template<typename T>
     void setNames(T beg, T end);
 
     template<typename T>
-    void getNames(T insert_iter);
+    void getNames(T insert_iter) const;
 
+    typename RObject<RTYPE>::ValueType operator[](const R_len_t i) const;
     typename RObject<RTYPE>::ValueType& operator[](const R_len_t i);
+    typename RObject<RTYPE>::ValueType operator()(const R_len_t i) const;
     typename RObject<RTYPE>::ValueType& operator()(const R_len_t i);
   };
 
@@ -59,7 +61,7 @@ namespace RAbstraction {
   RVector<RTYPE>::RVector(const SEXP x) : RObject<RTYPE>(x) {}
 
   template<SEXPTYPE RTYPE>
-  const R_len_t RVector<RTYPE>::len() {
+  const R_len_t RVector<RTYPE>::len() const {
     SEXP r_object = handle_->getRObject();
     return length(r_object);
   }
@@ -85,7 +87,7 @@ namespace RAbstraction {
 
   template<SEXPTYPE RTYPE>
   template<typename T>
-  void RVector<RTYPE>::getNames(T insert_iter) {
+  void RVector<RTYPE>::getNames(T insert_iter) const {
     SEXP r_object, r_object_names, cnames;
 
     r_object = handle_->getRObject();
@@ -97,12 +99,26 @@ namespace RAbstraction {
     sexp2string(r_object_names,insert_iter);
   }
 
+  template<SEXPTYPE RTYPE>
+  inline
+  typename RObject<RTYPE>::ValueType RVector<RTYPE>::operator[](const R_len_t i) const {
+    SEXP r_object = handle_->getRObject();
+    return Rtype<RTYPE>::index(r_object, i);
+  }
 
   template<SEXPTYPE RTYPE>
   inline
   typename RObject<RTYPE>::ValueType& RVector<RTYPE>::operator[](const R_len_t i) {
     SEXP r_object = handle_->getRObject();
     return Rtype<RTYPE>::index(r_object, i);
+  }
+
+  // same as operator[], but implements auto wrapping index (ie index = i % len)
+  template<SEXPTYPE RTYPE>
+  inline
+  typename RObject<RTYPE>::ValueType RVector<RTYPE>::operator()(const R_len_t i) const {
+    SEXP r_object = handle_->getRObject();
+    return Rtype<RTYPE>::index(r_object, i % len());
   }
 
   // same as operator[], but implements auto wrapping index (ie index = i % len)
