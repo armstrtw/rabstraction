@@ -72,6 +72,18 @@ public:
   }
 };
 
+template<>
+class Rtype<VECSXP> {
+public:
+  typedef SEXP ValueType;
+  static SEXP scalar(SEXP x) {
+    return VECTOR_ELT(x, 0);
+  }
+  static SEXP index(SEXP x, R_len_t i) {
+    return VECTOR_ELT(x, i);
+  }
+};
+
 
 
 #endif // RTYPE_HPP
