@@ -18,7 +18,6 @@
 #ifndef RTYPE_HPP
 #define RTYPE_HPP
 
-#include <string>
 #include <Rinternals.h>
 
 template<SEXPTYPE T>
@@ -63,24 +62,25 @@ public:
 template<>
 class Rtype<STRSXP> {
 public:
-  typedef const char* ValueType;
-  static const char* scalar(SEXP x) {
-    return CHAR(STRING_ELT(x, 0));
+  typedef SEXP ValueType;
+  static SEXP& scalar(SEXP x) {
+    return STRING_PTR(x)[0];
   }
-  static const char* index(SEXP x, R_len_t i) {
-    return CHAR(STRING_ELT(x, i));
+  static SEXP& index(SEXP x, R_len_t i) {
+    return STRING_PTR(x)[i];
   }
 };
+
 
 template<>
 class Rtype<VECSXP> {
 public:
   typedef SEXP ValueType;
   static SEXP scalar(SEXP x) {
-    return VECTOR_ELT(x, 0);
+    return VECTOR_ELT(x,0);
   }
   static SEXP index(SEXP x, R_len_t i) {
-    return VECTOR_ELT(x, i);
+    return VECTOR_ELT(x,i);
   }
 };
 
