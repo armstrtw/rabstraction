@@ -33,6 +33,7 @@ namespace RAbstraction {
     RVector();
     RVector(const R_len_t len);
     RVector(const SEXP x);
+    RVector(const RVector& x);
 
     const R_len_t len() const;
 
@@ -59,6 +60,9 @@ namespace RAbstraction {
 
   template<SEXPTYPE RTYPE>
   RVector<RTYPE>::RVector(const SEXP x) : RObject<RTYPE>(x) {}
+
+  template<SEXPTYPE RTYPE>
+  RVector<RTYPE>::RVector(const RVector& x) : RObject<RTYPE>(x) {}
 
   template<SEXPTYPE RTYPE>
   const R_len_t RVector<RTYPE>::len() const {

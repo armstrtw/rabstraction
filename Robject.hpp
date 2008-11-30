@@ -32,6 +32,7 @@ namespace RAbstraction {
     RObject();
     RObject(const R_len_t len);
     RObject(const SEXP x);
+    RObject(const RObject& x);
 
     void setAttribute(const SEXP attrubuteSymbol, const SEXP attributeValue);
     void setAttribute(const char* attrubuteName, const SEXP attributeValue);
@@ -66,6 +67,12 @@ namespace RAbstraction {
   template<SEXPTYPE RTYPE>
   RObject<RTYPE>::RObject(const SEXP x) {
     handle_ = Rbackend<RTYPE>::init(x);
+  }
+
+  template<SEXPTYPE RTYPE>
+  RObject<RTYPE>::RObject(const RObject& x) {
+    handle_ = x.handle_;
+    handle_->attach();
   }
 
   template<SEXPTYPE RTYPE>
