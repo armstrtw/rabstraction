@@ -36,8 +36,8 @@ namespace RAbstraction {
 
     void setAttribute(const SEXP attrubuteSymbol, const SEXP attributeValue);
     void setAttribute(const char* attrubuteName, const SEXP attributeValue);
-    const SEXP fetchAttribute(const char* attrubuteName);
-    const SEXP fetchAttribute(const SEXP attrubuteSymbol);
+    const SEXP getAttribute(const char* attrubuteName);
+    const SEXP getAttribute(const SEXP attrubuteSymbol);
 
     const R_len_t length();
 
@@ -45,6 +45,9 @@ namespace RAbstraction {
     void setClass(T beg, T end);
 
     void setClass(const char* cls);
+
+    template<typename T>
+    void getClass(T cont);
 
     const SEXP getSEXP();
   };
@@ -95,18 +98,18 @@ namespace RAbstraction {
 
 
   template<SEXPTYPE RTYPE>
-  const SEXP RObject<RTYPE>::fetchAttribute(const char* attrubuteName) {
+  const SEXP RObject<RTYPE>::getAttribute(const char* attrubuteName) {
     if(getSEXP()==R_NilValue) {
-      Rprintf("could not fetch attribute on uninitialized R_Object.\n");
+      Rprintf("could not get attribute on uninitialized R_Object.\n");
       return;
     }
     return getAttrib(getSEXP(),install(attrubuteName));
   }
 
   template<SEXPTYPE RTYPE>
-  const SEXP RObject<RTYPE>::fetchAttribute(const SEXP attrubuteSymbol) {
+  const SEXP RObject<RTYPE>::getAttribute(const SEXP attrubuteSymbol) {
     if(getSEXP()==R_NilValue) {
-      Rprintf("could not fetch attribute on uninitialized R_Object.\n");
+      Rprintf("could not get attribute on uninitialized R_Object.\n");
       return;
     }
     return getAttrib(getSEXP(), attrubuteSymbol);
@@ -135,6 +138,12 @@ namespace RAbstraction {
     UNPROTECT(1);
   }
 
+  template<SEXPTYPE RTYPE>
+  template<typename T>
+  void RObject<RTYPE>::getClass(T insert_iter) {
+    SEXP klass = getAttrib(getSEXP(),R_ClassSymbol);
+    sexp2string(klass, insert_iter);
+  }
 
   template<SEXPTYPE RTYPE>
   const SEXP RObject<RTYPE>::getSEXP() {
