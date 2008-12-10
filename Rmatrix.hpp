@@ -64,7 +64,7 @@ namespace RAbstraction {
     SEXP dims;
 
     // check overflow
-    if(static_cast<double>(rows) * static_cast<double>(cols) > INT_MAX) {
+    if(static_cast<double>(rows) * static_cast<double>(cols) > std::numeric_limits<R_len_t>::max()) {
       handle_->detach();
       handle_ = Rbackend<RTYPE>::init();
       Rprintf("matrix dimensions too big.\n");
