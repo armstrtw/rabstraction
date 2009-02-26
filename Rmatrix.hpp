@@ -18,6 +18,8 @@
 #ifndef RMATRIX_HPP
 #define RMATRIX_HPP
 
+#include <limits>
+
 #include <Rinternals.h>
 #include <Robject.hpp>
 #include <Rutilities.hpp>
