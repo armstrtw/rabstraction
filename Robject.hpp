@@ -20,6 +20,7 @@
 
 #include <Rinternals.h>
 #include <R.backend.hpp>
+#include <Rtype.hpp>
 
 namespace RAbstraction {
 

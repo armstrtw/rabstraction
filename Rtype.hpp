@@ -20,70 +20,71 @@
 
 #include <Rinternals.h>
 
-template<SEXPTYPE T>
-class Rtype;
+namespace RAbstraction {
 
-template<>
-class Rtype<REALSXP> {
-public:
-  typedef double ValueType;
-  static double& scalar(SEXP x) {
-    return REAL(x)[0];
-  }
-  static double& index(SEXP x, R_len_t i) {
-    return REAL(x)[i];
-  }
-};
+  template<SEXPTYPE T>
+  class Rtype;
 
-template<>
-class Rtype<INTSXP> {
-public:
-  typedef int ValueType;
-  static int& scalar(SEXP x) {
-    return INTEGER(x)[0];
-  }
-  static int& index(SEXP x, R_len_t i) {
-    return INTEGER(x)[i];
-  }
-};
+  template<>
+  class Rtype<REALSXP> {
+  public:
+    typedef double ValueType;
+    static double& scalar(SEXP x) {
+      return REAL(x)[0];
+    }
+    static double& index(SEXP x, R_len_t i) {
+      return REAL(x)[i];
+    }
+  };
 
-template<>
-class Rtype<LGLSXP> {
-public:
-  typedef int ValueType;
-  static int& scalar(SEXP x) {
-    return LOGICAL(x)[0];
-  }
-  static int& index(SEXP x, R_len_t i) {
-    return LOGICAL(x)[i];
-  }
-};
+  template<>
+  class Rtype<INTSXP> {
+  public:
+    typedef int ValueType;
+    static int& scalar(SEXP x) {
+      return INTEGER(x)[0];
+    }
+    static int& index(SEXP x, R_len_t i) {
+      return INTEGER(x)[i];
+    }
+  };
 
-template<>
-class Rtype<STRSXP> {
-public:
-  typedef SEXP ValueType;
-  static SEXP& scalar(SEXP x) {
-    return STRING_PTR(x)[0];
-  }
-  static SEXP& index(SEXP x, R_len_t i) {
-    return STRING_PTR(x)[i];
-  }
-};
+  template<>
+  class Rtype<LGLSXP> {
+  public:
+    typedef int ValueType;
+    static int& scalar(SEXP x) {
+      return LOGICAL(x)[0];
+    }
+    static int& index(SEXP x, R_len_t i) {
+      return LOGICAL(x)[i];
+    }
+  };
 
-
-template<>
-class Rtype<VECSXP> {
-public:
-  typedef SEXP ValueType;
-  static SEXP scalar(SEXP x) {
-    return VECTOR_ELT(x,0);
-  }
-  static SEXP index(SEXP x, R_len_t i) {
-    return VECTOR_ELT(x,i);
-  }
-};
+  template<>
+  class Rtype<STRSXP> {
+  public:
+    typedef SEXP ValueType;
+    static SEXP& scalar(SEXP x) {
+      return STRING_PTR(x)[0];
+    }
+    static SEXP& index(SEXP x, R_len_t i) {
+      return STRING_PTR(x)[i];
+    }
+  };
 
 
+  template<>
+  class Rtype<VECSXP> {
+  public:
+    typedef SEXP ValueType;
+    static SEXP scalar(SEXP x) {
+      return VECTOR_ELT(x,0);
+    }
+    static SEXP index(SEXP x, R_len_t i) {
+      return VECTOR_ELT(x,i);
+    }
+  };
 
+} // namespace RAbstraction
 #endif // RTYPE_HPP
