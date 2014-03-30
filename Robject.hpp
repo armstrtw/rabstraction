@@ -102,7 +102,7 @@ namespace RAbstraction {
   const SEXP RObject<RTYPE>::getAttribute(const char* attrubuteName) {
     if(getSEXP()==R_NilValue) {
       Rprintf("could not get attribute on uninitialized R_Object.\n");
-      return;
+      return R_NilValue;
     }
     return getAttrib(getSEXP(),install(attrubuteName));
   }
@@ -111,7 +111,7 @@ namespace RAbstraction {
   const SEXP RObject<RTYPE>::getAttribute(const SEXP attrubuteSymbol) {
     if(getSEXP()==R_NilValue) {
       Rprintf("could not get attribute on uninitialized R_Object.\n");
-      return;
+      return R_NilValue;
     }
     return getAttrib(getSEXP(), attrubuteSymbol);
   }
