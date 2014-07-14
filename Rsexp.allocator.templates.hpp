@@ -19,10 +19,11 @@
 #define RSEXP_ALLOCATOR_TEMPLATES_HPP
 
 #include <Rinternals.h>
+
 namespace RAbstraction {
 
   template<typename T>
-  class R_allocator {
+  class Rallocator {
   public:
     static SEXP Matrix(const int nr, const int nc);
     static SEXP Vector(const int len);
@@ -31,7 +32,7 @@ namespace RAbstraction {
   };
 
   template<>
-  class R_allocator<double> {
+  class Rallocator<double> {
   public:
     static SEXP Matrix(const int nr, const int nc) {
       SEXP ans = allocMatrix(REALSXP,nr,nc);
@@ -53,7 +54,7 @@ namespace RAbstraction {
   };
 
   template<>
-  class R_allocator<int> {
+  class Rallocator<int> {
   public:
     static SEXP Matrix(const int nr, const int nc) {
       SEXP ans = allocMatrix(INTSXP,nr,nc);
@@ -75,7 +76,7 @@ namespace RAbstraction {
   };
 
   template<>
-  class R_allocator<bool> {
+  class Rallocator<bool> {
   public:
     static SEXP Matrix(const int nr, const int nc) {
       SEXP ans = allocMatrix(LGLSXP,nr,nc);
@@ -95,6 +96,7 @@ namespace RAbstraction {
       return LOGICAL(x)[0];
     }
   };
+
 } // namespace RAbstraction
 
 #endif // RSEXP_ALLOCATOR_TEMPLATES_HPP
